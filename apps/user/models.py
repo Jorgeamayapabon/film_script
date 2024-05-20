@@ -1,9 +1,13 @@
 from django.db import models
 
 
-# Create your models here.
 class UserModel(models.Model):
     """
+    A model representing a user in the system.
+
+    Attributes:
+        fullname (str): The full name of the user.
+        email (str): The email address of the user.
     """
     fullname = models.CharField(
         "Fullname",
@@ -31,6 +35,11 @@ class UserModel(models.Model):
 
 class AccountModel(models.Model):
     """
+    A model representing an account in the system.
+
+    Attributes:
+        uuid (str): Unique identifier for the account (up to 45 characters).
+        name (str): The name of the account (up to 45 characters).
     """
     uuid = models.CharField(
         "uuid",
@@ -58,6 +67,12 @@ class AccountModel(models.Model):
 
 class UserAccountRel(models.Model):
     """
+    A model representing the relationship between users and accounts in the system.
+
+    Attributes:
+        user_id (UserModel): The user associated with the account.
+        account_id (AccountModel): The account associated with the user.
+        user_type (str): The role of the user in the account. Choices are 'Owner', 'Screenwriter', or 'Viewer'.
     """
     class USERTYPE(models.TextChoices):
         OWNER = "Owner"

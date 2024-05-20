@@ -162,3 +162,7 @@ cython_debug/
 
 front/film_script/.gitignore
 front/film_script/requirements.txt
+
+migrations/
+0001_initial.py
+0002_initial.py

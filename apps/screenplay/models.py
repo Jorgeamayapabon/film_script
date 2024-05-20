@@ -2,9 +2,71 @@ from django.db import models
 from apps.user.models import AccountModel, UserModel
 
 
-# Create your models here.
 class FilmScriptModel(models.Model):
     """
+    A model representing a film script in the system.
+
+    Attributes:
+        author (UserModel): The author of the script.
+        account (AccountModel): The account associated with the script.
+        title (str): The title of the film script.
+        genre (str): The genre of the film script.
+        actor_location (str): The location of the actor in the scene.
+        actor_gesture (str): The gesture or action of the actor in the scene.
+    """
+    owner = models.ForeignKey(
+        UserModel,
+        verbose_name="Owner",
+        on_delete=models.CASCADE,
+        null=False,
+        blank=False,
+        help_text="Script owner",
+        related_name="filmscript_user_owner",
+    )
+    
+    account = models.ForeignKey(
+        AccountModel,
+        verbose_name="account",
+        on_delete=models.CASCADE,
+        null=False,
+        blank=False,
+        help_text="Script account",
+    )
+    
+    title = models.CharField(
+        "Title",
+        max_length=45,
+        null=False,
+        blank=False,
+    )
+    
+    genre = models.CharField(
+        "Genre",
+        max_length=45,
+        null=False,
+        blank=False,
+    )
+    
+    def __str__(self) -> str:
+        return f"{self.title}"
+
+    class Meta:
+        db_table = "film_script"
+        verbose_name = "filmscript"
+        verbose_name_plural = "filmscripts"
+        ordering = ["id"]
+
+
+class SceneModel(models.Model):
+    """
+    A model representing a Scene in the system.
+
+    Attributes:
+        film_script (FilmScriptModel): The film script of the scene.
+        name (str): The name of the scene.
+        actor_name (str): The actor's name of the scene.
+        actor_location (str): The location of the actor in the scene.
+        actor_gesture (str): The gesture or action of the actor in the scene.
     """
     class ACTORGESTURE(models.TextChoices):
         # Positive Emotions
@@ -58,40 +120,24 @@ class FilmScriptModel(models.Model):
         LOCATION_5 = "4,4,4,40,40,40", "Location 5: (x=4, y=4, z=4, rx=40, ry=40, rz=40)"
         LOCATION_6 = "5,5,5,50,50,50", "Location 6: (x=5, y=5, z=5, rx=50, ry=50, rz=50)"
 
-    author = models.ForeignKey(
-        UserModel,
-        verbose_name="author",
+    film_script = models.ForeignKey(
+        FilmScriptModel,
+        verbose_name="film_script",
         on_delete=models.CASCADE,
         null=False,
         blank=False,
-        help_text="Script author",
+        help_text="Film script",        
     )
     
-    account = models.ForeignKey(
-        AccountModel,
-        verbose_name="account",
-        on_delete=models.CASCADE,
-        null=False,
-        blank=False,
-        help_text="Script account",
-    )
-    
-    title = models.CharField(
-        "Title",
+    name = models.CharField(
+        "name",
         max_length=45,
         null=False,
         blank=False,
     )
     
-    genre = models.CharField(
-        "Genre",
-        max_length=45,
-        null=False,
-        blank=False,
-    )
-    
-    uuid = models.CharField(
-        "uuid",
+    actor_name = models.CharField(
+        "Actor name",
         max_length=45,
         null=False,
         blank=False,
@@ -100,20 +146,92 @@ class FilmScriptModel(models.Model):
     actor_location = models.CharField(
         "Actor location",
         max_length=60,
+        null=False,
+        blank=False,
         choices=ACTORLOCATION.choices,
     )
     
     actor_gesture = models.CharField(
         "Actor gesture",
         max_length=60,
+        null=False,
+        blank=False,
         choices=ACTORGESTURE.choices,
     )
     
+    dialogue = models.TextField(
+        "Actor dialogue",
+        blank=True,
+    )
+    
+    created_by = models.ForeignKey(
+        UserModel,
+        verbose_name="Created by",
+        on_delete=models.DO_NOTHING,
+        null=False,
+        blank=False,
+        help_text="Scene creator",
+        related_name="scene_user_creator",
+    )
+    
+    updated_by = models.ForeignKey(
+        UserModel,
+        verbose_name="Updated by",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        help_text="Scene updater",
+        related_name="scene_user_updater",
+    )
+    
     def __str__(self) -> str:
-        return f"{self.title}"
+        return f"{self.name}"
 
     class Meta:
-        db_table = "film_script"
-        verbose_name = "filmscript"
-        verbose_name_plural = "film scripts"
+        db_table = "scene"
+        verbose_name = "Scene"
+        verbose_name_plural = "Scenes"
+        ordering = ["id"]
+
+
+class HistoricSceneModel(models.Model):
+    """
+    A model representing a historic scene in the system.
+
+    Attributes:
+        scene (SceneModel): The scene of the historic.
+        updater (UserModel): The user updater of the scene.
+        update_at (DateTimeField): The update datetime of the scene.
+    """
+    scene = models.ForeignKey(
+        SceneModel,
+        verbose_name="Scene",
+        on_delete=models.CASCADE,
+        null=False,
+        blank=False,
+        help_text="Historic scene",
+    )
+    
+    updated_by = models.ForeignKey(
+        UserModel,
+        verbose_name="Updated by",
+        on_delete=models.DO_NOTHING,
+        null=False,
+        blank=False,
+        help_text="Scener updater",
+        related_name="historic_user_updater",
+    )
+    
+    update_at = models.DateTimeField(
+        "Updated at",
+        auto_now=True,
+    )
+
+    def __str__(self) -> str:
+        return f"{self.name}"
+
+    class Meta:
+        db_table = "historic_scene"
+        verbose_name = "HistoricScene"
+        verbose_name_plural = "HistoricScenes"
         ordering = ["id"]
