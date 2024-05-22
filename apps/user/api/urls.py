@@ -1,19 +1,12 @@
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
-
-from apps.user.api.views import (
-    AccountModelViewSet,
-    UserAccountRelViewSet, 
-    UserModelViewSet
-)
-
-
-router = DefaultRouter()
-
-router.register("user", UserModelViewSet, basename="user")
-router.register("account", AccountModelViewSet, basename="account")
-router.register("user_account_rel", UserAccountRelViewSet, basename="user_account_rel")
+from django.urls import path
+from apps.user.api import views
 
 urlpatterns = [
-    path("", include(router.urls)),
+    path("signup/", views.CreateUserView.as_view()),
+    path("signin/", views.CreateTokenView.as_view()),
+    path("user/", views.RetrieveUpdateUserView.as_view()),
+    path("account/create/", views.CreateAccountView.as_view()),
+    path("account/", views.ListMyAccountView.as_view()),
+    path("account/shared/", views.ListSharedAccountView.as_view()),
+    path("user-account-rel/", views.CreateUserAccountRelView.as_view()),
 ]

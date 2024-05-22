@@ -1,5 +1,5 @@
 from django.db import models
-from apps.user.models import AccountModel, UserModel
+from apps.user.models import AccountModel, User
 
 
 class FilmScriptModel(models.Model):
@@ -7,15 +7,13 @@ class FilmScriptModel(models.Model):
     A model representing a film script in the system.
 
     Attributes:
-        author (UserModel): The author of the script.
+        owner (UserModel): The author of the script.
         account (AccountModel): The account associated with the script.
         title (str): The title of the film script.
         genre (str): The genre of the film script.
-        actor_location (str): The location of the actor in the scene.
-        actor_gesture (str): The gesture or action of the actor in the scene.
     """
     owner = models.ForeignKey(
-        UserModel,
+        User,
         verbose_name="Owner",
         on_delete=models.CASCADE,
         null=False,
@@ -31,6 +29,7 @@ class FilmScriptModel(models.Model):
         null=False,
         blank=False,
         help_text="Script account",
+        related_name="filmscript_account"
     )
     
     title = models.CharField(
@@ -165,7 +164,7 @@ class SceneModel(models.Model):
     )
     
     created_by = models.ForeignKey(
-        UserModel,
+        User,
         verbose_name="Created by",
         on_delete=models.DO_NOTHING,
         null=False,
@@ -175,7 +174,7 @@ class SceneModel(models.Model):
     )
     
     updated_by = models.ForeignKey(
-        UserModel,
+        User,
         verbose_name="Updated by",
         on_delete=models.SET_NULL,
         null=True,
@@ -200,7 +199,7 @@ class HistoricSceneModel(models.Model):
 
     Attributes:
         scene (SceneModel): The scene of the historic.
-        updater (UserModel): The user updater of the scene.
+        updated_by (UserModel): The user updater of the scene.
         update_at (DateTimeField): The update datetime of the scene.
     """
     scene = models.ForeignKey(
@@ -211,9 +210,9 @@ class HistoricSceneModel(models.Model):
         blank=False,
         help_text="Historic scene",
     )
-    
+
     updated_by = models.ForeignKey(
-        UserModel,
+        User,
         verbose_name="Updated by",
         on_delete=models.DO_NOTHING,
         null=False,
@@ -221,14 +220,11 @@ class HistoricSceneModel(models.Model):
         help_text="Scener updater",
         related_name="historic_user_updater",
     )
-    
+
     update_at = models.DateTimeField(
         "Updated at",
         auto_now=True,
     )
-
-    def __str__(self) -> str:
-        return f"{self.name}"
 
     class Meta:
         db_table = "historic_scene"

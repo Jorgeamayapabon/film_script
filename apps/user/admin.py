@@ -2,19 +2,19 @@ from django.contrib import admin
 
 from apps.user.models import (
     AccountModel,
-    UserModel
+    User
 )
 
 
-@admin.register(UserModel)
+@admin.register(User)
 class UserScripterAdmin(admin.ModelAdmin):
     # readonly_fields = ("id", "owner", "account")
     list_display = [
         "id", 
-        "fullname", 
+        "name", 
         "email",
     ]
-    search_fields = ["fullname"]
+    search_fields = ["name"]
     
 
 @admin.register(AccountModel)
