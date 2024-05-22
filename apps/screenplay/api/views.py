@@ -32,6 +32,35 @@ class UpdateFilmScriptView(generics.UpdateAPIView):
     serializer_class = FilmScriptModelSerializer
     authentication_classes = [authentication.TokenAuthentication]
     permission_classes = [permissions.IsAuthenticated]
+    queryset = FilmScriptModel.objects.all()
+
+    def partial_update(self, request, *args, **kwargs):
+        film_script = FilmScriptModel.objects.get(id=self.kwargs["film_script_id"])
+        account = film_script.account
+
+        user_account_rel: UserAccountRel = self.request.user.user_account_rel.filter(
+            account=account
+        ).first()
+
+        if (
+                user_account_rel.user_type == "Owner"
+                or user_account_rel.user_type == "Screenwriter"
+        ):
+            # Obtener el serializador con la instancia existente y los datos nuevos
+            serializer = self.get_serializer(film_script, data=request.data, partial=True)
+
+            # Validar los datos
+            serializer.is_valid(raise_exception=True)
+
+            # Guardar los cambios
+            self.perform_update(serializer)
+
+            # Devolver la respuesta con los datos actualizados
+            return Response(serializer.data, status=200)
+        return Response(
+            status=403,
+            data={"Error": "You do not have permissions to modify the scene"}
+        )
 
 
 class ListMyFilmScriptsView(generics.ListAPIView):
@@ -74,6 +103,35 @@ class UpdateSceneView(generics.UpdateAPIView):
     serializer_class = SceneModelSerializer
     authentication_classes = [authentication.TokenAuthentication]
     permission_classes = [permissions.IsAuthenticated]
+    queryset = SceneModel.objects.all()
+
+    def partial_update(self, request, *args, **kwargs):
+        scene = SceneModel.objects.get(id=self.kwargs["scene_id"])
+        account = scene.film_script.account
+
+        user_account_rel: UserAccountRel = self.request.user.user_account_rel.filter(
+            account=account
+        ).first()
+
+        if (
+            user_account_rel.user_type == "Owner"
+            or user_account_rel.user_type == "Screenwriter"
+        ):
+            # Obtener el serializador con la instancia existente y los datos nuevos
+            serializer = self.get_serializer(scene, data=request.data, partial=True)
+
+            # Validar los datos
+            serializer.is_valid(raise_exception=True)
+
+            # Guardar los cambios
+            self.perform_update(serializer)
+
+            # Devolver la respuesta con los datos actualizados
+            return Response(serializer.data, status=200)
+        return Response(
+            status=403,
+            data={"Error": "You do not have permissions to modify the scene"}
+        )
 
 
 class ListSceneView(generics.ListAPIView):
