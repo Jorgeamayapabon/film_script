@@ -5,6 +5,7 @@ import flet as ft
 AUTH_URL = "http://127.0.0.1:8000/user/signin/"
 SIGNUP_URL = "http://127.0.0.1:8000/user/signup/"
 
+
 def main(page: ft.Page):
     page.title = "Tu sitio de Guiones"
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
